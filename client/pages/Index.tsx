@@ -263,6 +263,7 @@ export default function Index() {
 
       if (data.success) {
         setModelPerformance(data.performance || {});
+        setFeatureImportance(data.feature_importance || {});
         setMLStatus(prev => ({ ...prev, modelsLoaded: true }));
       }
     } catch (error) {
