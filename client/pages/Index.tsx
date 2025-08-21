@@ -107,16 +107,48 @@ export default function Index() {
     };
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.driverAge || formData.driverAge < 16 || formData.driverAge > 100) {
+      newErrors.driverAge = 'Driver age must be between 16 and 100';
+    }
+
+    if (formData.vehicleAge < 0 || formData.vehicleAge > 30) {
+      newErrors.vehicleAge = 'Vehicle age must be between 0 and 30 years';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
-    
-    // Simulate API call delay
+    setProgress(0);
+
+    // Simulate API call with progress
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + 20;
+        return newProgress >= 100 ? 100 : newProgress;
+      });
+    }, 300);
+
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
+    clearInterval(progressInterval);
+    setProgress(100);
+
     const riskResult = calculateRisk(formData);
     setResult(riskResult);
     setIsLoading(false);
+    setProgress(0);
   };
 
   const handleInputChange = (field: keyof RiskAssessmentInput, value: string) => {
