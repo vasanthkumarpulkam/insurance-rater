@@ -345,14 +345,25 @@ export default function Index() {
                 <div className="space-y-6">
                   {/* Risk Score */}
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-primary mb-2">
-                      {result.riskScore}
+                    <div className="relative">
+                      <div className="text-4xl font-bold text-primary mb-2 animate-in fade-in-50 duration-500">
+                        {result.riskScore}
+                      </div>
+                      <Progress
+                        value={result.riskScore}
+                        className="w-32 mx-auto mb-2"
+                      />
                     </div>
                     <div className="text-lg text-gray-600">Risk Score (0-100)</div>
-                    <Badge 
+                    <Badge
                       variant={result.riskCategory === 'Low' ? 'default' : 'destructive'}
-                      className="mt-2"
+                      className="mt-2 animate-in slide-in-from-bottom-2 duration-700"
                     >
+                      {result.riskCategory === 'Low' ? (
+                        <CheckCircle2 className="mr-1 h-3 w-3" />
+                      ) : (
+                        <AlertCircle className="mr-1 h-3 w-3" />
+                      )}
                       {result.riskCategory} Risk
                     </Badge>
                   </div>
