@@ -26,6 +26,43 @@ interface RiskResult {
   keyReasons: string[];
 }
 
+interface MLModelPerformance {
+  model_name: string;
+  task_type: string;
+  accuracy?: number;
+  precision?: number;
+  recall?: number;
+  f1_score?: number;
+  roc_auc?: number;
+  mse?: number;
+  rmse?: number;
+  mae?: number;
+  r2_score?: number;
+}
+
+interface DatasetStats {
+  total_samples: number;
+  claim_rate: number;
+  avg_risk_score: number;
+  avg_premium: number;
+  avg_claim_cost: number;
+  feature_stats: {
+    driver_age: { mean: number; min: number; max: number };
+    vehicle_age: { mean: number; min: number; max: number };
+    violations: { mean: number; max: number };
+    accidents: { mean: number; max: number };
+  };
+}
+
+interface MLPrediction {
+  risk_score: number;
+  claim_probability: number;
+  suggested_premium: number;
+  premium_adjustment: string;
+  base_premium: number;
+  risk_category: string;
+}
+
 const BASELINE_PREMIUM = 1200; // Base annual premium
 
 export default function Index() {
