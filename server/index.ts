@@ -2,6 +2,14 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  installDependencies,
+  generateDataset,
+  trainModels,
+  getModelPerformance,
+  predictWithML,
+  getDatasetStats
+} from "./routes/ml";
 
 export function createServer() {
   const app = express();
