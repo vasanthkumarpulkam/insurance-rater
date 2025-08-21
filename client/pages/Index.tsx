@@ -83,6 +83,7 @@ export default function Index() {
   // ML Dashboard state
   const [mlResult, setMLResult] = useState<MLPrediction | null>(null);
   const [modelPerformance, setModelPerformance] = useState<Record<string, MLModelPerformance>>({});
+  const [featureImportance, setFeatureImportance] = useState<Record<string, Record<string, number>>>({});
   const [datasetStats, setDatasetStats] = useState<DatasetStats | null>(null);
   const [mlStatus, setMLStatus] = useState({
     datasetGenerated: false,
