@@ -27,5 +27,13 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // ML API routes
+  app.post("/api/ml/install-deps", installDependencies);
+  app.post("/api/ml/generate-dataset", generateDataset);
+  app.post("/api/ml/train-models", trainModels);
+  app.get("/api/ml/model-performance", getModelPerformance);
+  app.post("/api/ml/predict", predictWithML);
+  app.get("/api/ml/dataset-stats", getDatasetStats);
+
   return app;
 }
