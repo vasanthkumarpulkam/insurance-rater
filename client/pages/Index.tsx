@@ -276,7 +276,7 @@ export default function Index() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
+                  <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="priorClaims">
                       Prior Insurance Claims (last 5 years)
                     </Label>
