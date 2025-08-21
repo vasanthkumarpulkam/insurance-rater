@@ -208,6 +208,116 @@ export default function Index() {
     }));
   };
 
+  // ML API Functions
+  const generateDataset = async () => {
+    setMLStatus(prev => ({ ...prev, generating: true }));
+    try {
+      const response = await fetch('/api/ml/generate-dataset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ samples: 15000 })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setMLStatus(prev => ({ ...prev, datasetGenerated: true }));
+        await loadDatasetStats();
+      } else {
+        console.error('Dataset generation failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Error generating dataset:', error);
+    } finally {
+      setMLStatus(prev => ({ ...prev, generating: false }));
+    }
+  };
+
+  const trainModels = async () => {
+    setMLStatus(prev => ({ ...prev, training: true }));
+    try {
+      const response = await fetch('/api/ml/train-models', {
+        method: 'POST'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setMLStatus(prev => ({ ...prev, modelsLoaded: true }));
+        setModelPerformance(data.performance || {});
+      } else {
+        console.error('Model training failed:', data.error);
+      }
+    } catch (error) {
+      console.error('Error training models:', error);
+    } finally {
+      setMLStatus(prev => ({ ...prev, training: false }));
+    }
+  };
+
+  const loadModelPerformance = async () => {
+    try {
+      const response = await fetch('/api/ml/model-performance');
+      const data = await response.json();
+
+      if (data.success) {
+        setModelPerformance(data.performance || {});
+        setMLStatus(prev => ({ ...prev, modelsLoaded: true }));
+      }
+    } catch (error) {
+      console.error('Error loading model performance:', error);
+    }
+  };
+
+  const loadDatasetStats = async () => {
+    try {
+      const response = await fetch('/api/ml/dataset-stats');
+      const data = await response.json();
+
+      if (data.success) {
+        setDatasetStats(data.stats);
+        setMLStatus(prev => ({ ...prev, datasetGenerated: true }));
+      }
+    } catch (error) {
+      console.error('Error loading dataset stats:', error);
+    }
+  };
+
+  const predictWithMLModel = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/ml/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          driverAge: formData.driverAge,
+          vehicleAge: formData.vehicleAge,
+          vehicleType: 'Sedan', // Could be made dynamic
+          violations: formData.violations,
+          accidents: formData.accidents,
+          priorClaims: formData.priorClaims
+        })
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setMLResult(data.prediction);
+      } else {
+        console.error('ML prediction failed:', data.message);
+      }
+    } catch (error) {
+      console.error('Error making ML prediction:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load initial data
+  useEffect(() => {
+    loadModelPerformance();
+    loadDatasetStats();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
