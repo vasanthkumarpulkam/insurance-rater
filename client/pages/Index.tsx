@@ -245,6 +245,7 @@ export default function Index() {
       if (data.success) {
         setMLStatus(prev => ({ ...prev, modelsLoaded: true }));
         setModelPerformance(data.performance || {});
+        setFeatureImportance(data.feature_importance || {});
       } else {
         console.error('Model training failed:', data.error);
       }
