@@ -79,6 +79,18 @@ export default function Index() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [progress, setProgress] = useState(0);
 
+  // ML Dashboard state
+  const [mlResult, setMLResult] = useState<MLPrediction | null>(null);
+  const [modelPerformance, setModelPerformance] = useState<Record<string, MLModelPerformance>>({});
+  const [datasetStats, setDatasetStats] = useState<DatasetStats | null>(null);
+  const [mlStatus, setMLStatus] = useState({
+    datasetGenerated: false,
+    modelsLoaded: false,
+    training: false,
+    generating: false
+  });
+  const [activeTab, setActiveTab] = useState('assessment');
+
   // Simulated Random Forest model logic
   const calculateRisk = (input: RiskAssessmentInput): RiskResult => {
     let riskScore = 50; // Base score
