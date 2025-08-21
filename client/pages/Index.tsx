@@ -35,9 +35,11 @@ export default function Index() {
     accidents: 0,
     priorClaims: 0,
   });
-  
+
   const [result, setResult] = useState<RiskResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [progress, setProgress] = useState(0);
 
   // Simulated Random Forest model logic
   const calculateRisk = (input: RiskAssessmentInput): RiskResult => {
