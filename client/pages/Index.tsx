@@ -369,10 +369,10 @@ export default function Index() {
                   </div>
 
                   {/* Premium Suggestion */}
-                  <Card className="bg-blue-50 border-blue-200">
+                  <Card className="bg-blue-50 border-blue-200 animate-in slide-in-from-right duration-500">
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-700">
+                        <div className="text-2xl font-bold text-blue-700 animate-in zoom-in duration-700">
                           ${result.premiumSuggestion.toLocaleString()}
                         </div>
                         <div className="text-sm text-blue-600">
