@@ -941,75 +941,10 @@ export default function Index() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-6">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Model Comparison</CardTitle>
-                  <CardDescription>Compare performance across different algorithms</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {Object.keys(modelPerformance).length > 0 ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {Object.entries(modelPerformance)
-                          .filter(([_, metrics]) => metrics.task_type === 'classification')
-                          .map(([modelName, metrics]) => (
-                          <Card key={modelName} className="p-4">
-                            <h3 className="font-semibold capitalize mb-2">
-                              {modelName.replace('_classification', '').replace('_', ' ')}
-                            </h3>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span>Accuracy:</span>
-                                <span>{(metrics.accuracy! * 100).toFixed(1)}%</span>
-                              </div>
-                              {metrics.roc_auc && (
-                                <div className="flex justify-between">
-                                  <span>ROC AUC:</span>
-                                  <span>{(metrics.roc_auc * 100).toFixed(1)}%</span>
-                                </div>
-                              )}
-                              <Progress value={metrics.accuracy! * 100} className="w-full" />
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-
-                      <Card className="mt-6">
-                        <CardContent className="pt-6">
-                          <h3 className="font-semibold mb-4">Key Insights</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <Alert>
-                              <TrendingUp className="h-4 w-4" />
-                              <AlertDescription>
-                                <strong>Best Performing Model:</strong> Based on ROC AUC scores,
-                                {Object.entries(modelPerformance)
-                                  .filter(([_, metrics]) => metrics.task_type === 'classification' && metrics.roc_auc)
-                                  .sort((a, b) => b[1].roc_auc! - a[1].roc_auc!)[0]?.[0]
-                                  .replace('_classification', '').replace('_', ' ') || 'Random Forest'}
-                                shows the highest predictive accuracy.
-                              </AlertDescription>
-                            </Alert>
-                            <Alert>
-                              <Shield className="h-4 w-4" />
-                              <AlertDescription>
-                                <strong>Model Reliability:</strong> All models demonstrate consistent performance
-                                across validation sets, indicating robust predictive capabilities for insurance risk assessment.
-                              </AlertDescription>
-                            </Alert>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-gray-500">Train models to see analytics and performance comparisons.</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+            <ModelExplanation
+              featureImportance={featureImportance}
+              modelPerformance={modelPerformance}
+            />
           </TabsContent>
         </Tabs>
       </main>
