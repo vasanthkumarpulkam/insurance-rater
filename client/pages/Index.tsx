@@ -295,13 +295,30 @@ export default function Index() {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                {isLoading && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Analyzing risk factors...</span>
+                      <span>{progress}%</span>
+                    </div>
+                    <Progress value={progress} className="w-full" />
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isLoading}
                   size="lg"
                 >
-                  {isLoading ? 'Analyzing Risk...' : 'Calculate Risk Assessment'}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyzing Risk...
+                    </>
+                  ) : (
+                    'Calculate Risk Assessment'
+                  )}
                 </Button>
               </form>
             </CardContent>
