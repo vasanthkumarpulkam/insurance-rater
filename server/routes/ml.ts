@@ -7,15 +7,15 @@ import path from "path";
 const checkPythonAvailability = async (): Promise<string> => {
   return new Promise((resolve, reject) => {
     // Try python3 first, then python
-    exec('python3 --version', (error) => {
+    exec("python3 --version", (error) => {
       if (!error) {
-        resolve('python3');
+        resolve("python3");
       } else {
-        exec('python --version', (error) => {
+        exec("python --version", (error) => {
           if (!error) {
-            resolve('python');
+            resolve("python");
           } else {
-            reject(new Error('Python not found. Please install Python 3.7+'));
+            reject(new Error("Python not found. Please install Python 3.7+"));
           }
         });
       }
@@ -27,44 +27,47 @@ const checkPythonAvailability = async (): Promise<string> => {
 export const installDependencies: RequestHandler = async (req, res) => {
   try {
     const pythonCmd = await checkPythonAvailability();
-    
+
     // Install requirements
-    const installProcess = spawn(pythonCmd, ['-m', 'pip', 'install', '-r', 'ml/requirements.txt'], {
-      stdio: 'pipe'
-    });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    installProcess.stdout.on('data', (data) => {
+    const installProcess = spawn(
+      pythonCmd,
+      ["-m", "pip", "install", "-r", "ml/requirements.txt"],
+      {
+        stdio: "pipe",
+      },
+    );
+
+    let output = "";
+    let errorOutput = "";
+
+    installProcess.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    installProcess.stderr.on('data', (data) => {
+
+    installProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
-    
-    installProcess.on('close', (code) => {
+
+    installProcess.on("close", (code) => {
       if (code === 0) {
         res.json({
           success: true,
-          message: 'Dependencies installed successfully',
-          output: output
+          message: "Dependencies installed successfully",
+          output: output,
         });
       } else {
         res.status(500).json({
           success: false,
-          message: 'Failed to install dependencies',
-          error: errorOutput
+          message: "Failed to install dependencies",
+          error: errorOutput,
         });
       }
     });
-    
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Python not available',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Python not available",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -74,66 +77,68 @@ export const generateDataset: RequestHandler = async (req, res) => {
   try {
     const pythonCmd = await checkPythonAvailability();
     const { samples = 15000 } = req.body;
-    
-    const generateProcess = spawn(pythonCmd, ['ml/dataset_generator.py'], {
-      stdio: 'pipe'
+
+    const generateProcess = spawn(pythonCmd, ["ml/dataset_generator.py"], {
+      stdio: "pipe",
     });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    generateProcess.stdout.on('data', (data) => {
+
+    let output = "";
+    let errorOutput = "";
+
+    generateProcess.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    generateProcess.stderr.on('data', (data) => {
+
+    generateProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
-    
-    generateProcess.on('close', async (code) => {
+
+    generateProcess.on("close", async (code) => {
       if (code === 0) {
         // Check if dataset was created
         try {
-          const datasetPath = 'ml/data/insurance_dataset.csv';
+          const datasetPath = "ml/data/insurance_dataset.csv";
           const stats = await fs.stat(datasetPath);
-          
+
           // Read metadata if available
           let metadata = null;
           try {
-            const metadataContent = await fs.readFile('ml/data/insurance_dataset_metadata.json', 'utf-8');
+            const metadataContent = await fs.readFile(
+              "ml/data/insurance_dataset_metadata.json",
+              "utf-8",
+            );
             metadata = JSON.parse(metadataContent);
           } catch (e) {
             // Metadata file not found, that's okay
           }
-          
+
           res.json({
             success: true,
-            message: 'Dataset generated successfully',
+            message: "Dataset generated successfully",
             output: output,
             dataset_size: stats.size,
-            metadata: metadata
+            metadata: metadata,
           });
         } catch (e) {
           res.status(500).json({
             success: false,
-            message: 'Dataset generation completed but file not found',
-            error: errorOutput
+            message: "Dataset generation completed but file not found",
+            error: errorOutput,
           });
         }
       } else {
         res.status(500).json({
           success: false,
-          message: 'Failed to generate dataset',
-          error: errorOutput
+          message: "Failed to generate dataset",
+          error: errorOutput,
         });
       }
     });
-    
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error generating dataset',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Error generating dataset",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -142,59 +147,61 @@ export const generateDataset: RequestHandler = async (req, res) => {
 export const trainModels: RequestHandler = async (req, res) => {
   try {
     const pythonCmd = await checkPythonAvailability();
-    
-    const trainProcess = spawn(pythonCmd, ['ml/model_trainer.py'], {
-      stdio: 'pipe'
+
+    const trainProcess = spawn(pythonCmd, ["ml/model_trainer.py"], {
+      stdio: "pipe",
     });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    trainProcess.stdout.on('data', (data) => {
+
+    let output = "";
+    let errorOutput = "";
+
+    trainProcess.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    trainProcess.stderr.on('data', (data) => {
+
+    trainProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
-    
-    trainProcess.on('close', async (code) => {
+
+    trainProcess.on("close", async (code) => {
       if (code === 0) {
         try {
           // Read model metadata
-          const metadataContent = await fs.readFile('ml/models/metadata.json', 'utf-8');
+          const metadataContent = await fs.readFile(
+            "ml/models/metadata.json",
+            "utf-8",
+          );
           const metadata = JSON.parse(metadataContent);
-          
+
           res.json({
             success: true,
-            message: 'Models trained successfully',
+            message: "Models trained successfully",
             output: output,
             performance: metadata.model_performance,
             feature_importance: metadata.feature_importance,
-            models: metadata.models
+            models: metadata.models,
           });
         } catch (e) {
           res.json({
             success: true,
-            message: 'Models trained successfully',
+            message: "Models trained successfully",
             output: output,
-            note: 'Metadata not available'
+            note: "Metadata not available",
           });
         }
       } else {
         res.status(500).json({
           success: false,
-          message: 'Model training failed',
-          error: errorOutput
+          message: "Model training failed",
+          error: errorOutput,
         });
       }
     });
-    
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error training models',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Error training models",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -202,22 +209,22 @@ export const trainModels: RequestHandler = async (req, res) => {
 // Get model performance metrics
 export const getModelPerformance: RequestHandler = async (req, res) => {
   try {
-    const metadataPath = 'ml/models/metadata.json';
-    const metadataContent = await fs.readFile(metadataPath, 'utf-8');
+    const metadataPath = "ml/models/metadata.json";
+    const metadataContent = await fs.readFile(metadataPath, "utf-8");
     const metadata = JSON.parse(metadataContent);
-    
+
     res.json({
       success: true,
       performance: metadata.model_performance,
       feature_importance: metadata.feature_importance,
       models: metadata.models,
-      trained_at: metadata.trained_at
+      trained_at: metadata.trained_at,
     });
   } catch (error) {
     res.status(404).json({
       success: false,
-      message: 'Model metadata not found. Please train models first.',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Model metadata not found. Please train models first.",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -229,14 +236,14 @@ export const predictWithML: RequestHandler = async (req, res) => {
     const {
       driverAge,
       vehicleAge,
-      vehicleType = 'Sedan',
+      vehicleType = "Sedan",
       violations,
       accidents,
       priorClaims,
       geographicRisk = 1.0,
-      creditScore = 700
+      creditScore = 700,
     } = req.body;
-    
+
     // Create a temporary prediction script
     const predictionScript = `
 import sys
@@ -264,70 +271,69 @@ try:
 except Exception as e:
     print(json.dumps({"error": str(e)}))
 `;
-    
+
     // Write temporary script
-    const tempScriptPath = 'ml/temp_predict.py';
+    const tempScriptPath = "ml/temp_predict.py";
     await fs.writeFile(tempScriptPath, predictionScript);
-    
+
     const predictProcess = spawn(pythonCmd, [tempScriptPath], {
-      stdio: 'pipe'
+      stdio: "pipe",
     });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    predictProcess.stdout.on('data', (data) => {
+
+    let output = "";
+    let errorOutput = "";
+
+    predictProcess.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    predictProcess.stderr.on('data', (data) => {
+
+    predictProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
-    
-    predictProcess.on('close', async (code) => {
+
+    predictProcess.on("close", async (code) => {
       // Clean up temp file
       try {
         await fs.unlink(tempScriptPath);
       } catch (e) {
         // Ignore cleanup errors
       }
-      
+
       if (code === 0) {
         try {
           const result = JSON.parse(output.trim());
           if (result.error) {
             res.status(500).json({
               success: false,
-              message: result.error
+              message: result.error,
             });
           } else {
             res.json({
               success: true,
-              prediction: result
+              prediction: result,
             });
           }
         } catch (e) {
           res.status(500).json({
             success: false,
-            message: 'Failed to parse prediction result',
+            message: "Failed to parse prediction result",
             output: output,
-            error: errorOutput
+            error: errorOutput,
           });
         }
       } else {
         res.status(500).json({
           success: false,
-          message: 'Prediction failed',
-          error: errorOutput
+          message: "Prediction failed",
+          error: errorOutput,
         });
       }
     });
-    
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error making prediction',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Error making prediction",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -336,7 +342,7 @@ except Exception as e:
 export const getDatasetStats: RequestHandler = async (req, res) => {
   try {
     const pythonCmd = await checkPythonAvailability();
-    
+
     const statsScript = `
 import pandas as pd
 import json
@@ -378,69 +384,68 @@ try:
 except Exception as e:
     print(json.dumps({"error": str(e)}))
 `;
-    
-    const tempScriptPath = 'ml/temp_stats.py';
+
+    const tempScriptPath = "ml/temp_stats.py";
     await fs.writeFile(tempScriptPath, statsScript);
-    
+
     const statsProcess = spawn(pythonCmd, [tempScriptPath], {
-      stdio: 'pipe'
+      stdio: "pipe",
     });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    statsProcess.stdout.on('data', (data) => {
+
+    let output = "";
+    let errorOutput = "";
+
+    statsProcess.stdout.on("data", (data) => {
       output += data.toString();
     });
-    
-    statsProcess.stderr.on('data', (data) => {
+
+    statsProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
     });
-    
-    statsProcess.on('close', async (code) => {
+
+    statsProcess.on("close", async (code) => {
       // Clean up temp file
       try {
         await fs.unlink(tempScriptPath);
       } catch (e) {
         // Ignore cleanup errors
       }
-      
+
       if (code === 0) {
         try {
           const stats = JSON.parse(output.trim());
           if (stats.error) {
             res.status(404).json({
               success: false,
-              message: stats.error
+              message: stats.error,
             });
           } else {
             res.json({
               success: true,
-              stats: stats
+              stats: stats,
             });
           }
         } catch (e) {
           res.status(500).json({
             success: false,
-            message: 'Failed to parse dataset statistics',
+            message: "Failed to parse dataset statistics",
             output: output,
-            error: errorOutput
+            error: errorOutput,
           });
         }
       } else {
         res.status(500).json({
           success: false,
-          message: 'Failed to get dataset statistics',
-          error: errorOutput
+          message: "Failed to get dataset statistics",
+          error: errorOutput,
         });
       }
     });
-    
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error getting dataset statistics',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: "Error getting dataset statistics",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

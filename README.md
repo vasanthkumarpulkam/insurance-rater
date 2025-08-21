@@ -5,12 +5,14 @@ A production-ready full-stack application that combines traditional insurance ri
 ## 🚀 Features
 
 ### Core Insurance Assessment
+
 - **Real-time Risk Scoring**: Traditional rule-based risk assessment (0-100 scale)
 - **Premium Calculation**: Dynamic premium suggestions with adjustment factors
 - **Risk Categorization**: Low/High risk classification with detailed explanations
 - **Professional UI**: Modern, insurance industry-standard interface
 
 ### Advanced ML Capabilities
+
 - **Multiple ML Models**: Random Forest, XGBoost, and Explainable Boosting Machines (EBM)
 - **Synthetic Dataset Generation**: Realistic insurance data with 15,000+ samples
 - **Model Performance Monitoring**: Comprehensive metrics and validation
@@ -18,6 +20,7 @@ A production-ready full-stack application that combines traditional insurance ri
 - **Model Explainability**: Regulatory-friendly transparent decision making
 
 ### Technical Stack
+
 - **Frontend**: React 18 + TypeScript + TailwindCSS + Shadcn/ui
 - **Backend**: Express.js + Node.js
 - **ML Pipeline**: Python + scikit-learn + XGBoost + interpret
@@ -33,6 +36,7 @@ A production-ready full-stack application that combines traditional insurance ri
 3. **Explainable Boosting Machines (EBM)** - Transparent, regulatory-friendly models
 
 ### Risk Factors Analyzed
+
 - Driver age and experience
 - Vehicle age and type
 - Traffic violations history
@@ -44,17 +48,20 @@ A production-ready full-stack application that combines traditional insurance ri
 ## 🛠️ Setup & Installation
 
 ### Prerequisites
+
 - Node.js 18+ and PNPM
 - Python 3.7+ with pip
 
 ### Quick Start
 
 1. **Install Node.js dependencies**:
+
    ```bash
    pnpm install
    ```
 
 2. **Setup Python ML environment**:
+
    ```bash
    python3 ml/setup.py
    # or manually:
@@ -62,6 +69,7 @@ A production-ready full-stack application that combines traditional insurance ri
    ```
 
 3. **Start development server**:
+
    ```bash
    pnpm dev
    ```
@@ -76,28 +84,36 @@ A production-ready full-stack application that combines traditional insurance ri
 ## 📈 Using the ML Pipeline
 
 ### 1. Generate Synthetic Dataset
+
 Navigate to the "ML Models" tab and click "Generate Dataset" to create a realistic insurance dataset with:
+
 - 15,000 synthetic records
 - Realistic risk factor distributions
 - Proper claim rate patterns
 - Feature correlations based on industry data
 
 ### 2. Train ML Models
+
 Click "Train Models" to train all three algorithms:
+
 - Cross-validation for robust performance estimation
 - Feature importance calculation
 - Performance metrics (accuracy, precision, recall, ROC AUC)
 - Model persistence for production use
 
 ### 3. Model Comparison & Selection
+
 The "Analytics" tab provides:
+
 - Side-by-side model performance comparison
 - Feature importance visualization
 - Best model recommendations
 - Regulatory compliance insights
 
 ### 4. Production Predictions
+
 Use the trained models for enhanced risk assessment:
+
 - Higher accuracy than rule-based systems
 - Explainable predictions for regulatory compliance
 - Real-time inference capabilities
@@ -106,6 +122,7 @@ Use the trained models for enhanced risk assessment:
 ## 🔍 Model Explainability
 
 ### Feature Importance
+
 - **Traffic Violations**: Strongest predictor of claim likelihood
 - **Driver Age**: U-shaped risk curve (young and elderly drivers)
 - **Accident History**: Major factor in both frequency and severity
@@ -113,6 +130,7 @@ Use the trained models for enhanced risk assessment:
 - **Prior Claims**: Strong indicator of future claim behavior
 
 ### Regulatory Compliance
+
 - Transparent decision-making process
 - Audit trail for all predictions
 - Bias monitoring capabilities
@@ -121,6 +139,7 @@ Use the trained models for enhanced risk assessment:
 ## 🏗️ Architecture
 
 ### Frontend Architecture
+
 ```
 client/
 ├── pages/           # Route components with tabbed interface
@@ -130,6 +149,7 @@ client/
 ```
 
 ### Backend API
+
 ```
 server/
 ├── routes/ml.ts     # ML pipeline API endpoints
@@ -138,6 +158,7 @@ server/
 ```
 
 ### ML Pipeline
+
 ```
 ml/
 ├── dataset_generator.py  # Synthetic data generation
@@ -149,6 +170,7 @@ ml/
 ## 🚀 API Endpoints
 
 ### ML Pipeline Endpoints
+
 - `POST /api/ml/generate-dataset` - Generate synthetic insurance dataset
 - `POST /api/ml/train-models` - Train all ML models
 - `GET /api/ml/model-performance` - Get model metrics and performance
@@ -156,6 +178,7 @@ ml/
 - `GET /api/ml/dataset-stats` - Get dataset statistics
 
 ### Traditional Assessment
+
 - `GET /api/ping` - Health check
 - `GET /api/demo` - Demo endpoint
 
@@ -181,11 +204,13 @@ ml/
 ## 🎯 Production Deployment
 
 ### Cloud Deployment Options
+
 - **Netlify**: Connect via MCP integration for automatic deployment
 - **Vercel**: Built-in support with zero configuration
 - **Custom**: Use `pnpm build` and `pnpm start` for any hosting platform
 
 ### Model Serving
+
 - Models are automatically saved as joblib files
 - Python backend handles model loading and inference
 - Stateless API design for horizontal scaling
@@ -194,11 +219,13 @@ ml/
 ## 🔒 Security & Compliance
 
 ### Data Privacy
+
 - Synthetic data only - no real customer information
 - Secure model serving without data leakage
 - Environment variable management for sensitive config
 
 ### Regulatory Features
+
 - Model interpretability for insurance regulation compliance
 - Audit logging capabilities
 - Bias detection and monitoring
@@ -207,12 +234,14 @@ ml/
 ## 🧪 Testing & Validation
 
 ### Model Validation
+
 - Cross-validation with stratified sampling
 - Hold-out test sets for unbiased evaluation
 - Performance monitoring across demographic groups
 - A/B testing framework ready
 
 ### Code Quality
+
 - TypeScript for type safety
 - Comprehensive error handling
 - Input validation and sanitization
@@ -221,16 +250,19 @@ ml/
 ## 📚 Extensions & Customization
 
 ### Adding New Models
+
 1. Extend `model_trainer.py` with new algorithms
 2. Update API endpoints to handle new model types
 3. Add UI components for new model visualization
 
 ### Custom Risk Factors
+
 1. Modify `dataset_generator.py` for new features
 2. Update model training pipeline
 3. Extend frontend forms and validation
 
 ### Integration Options
+
 - REST API for external systems
 - Webhook support for real-time updates
 - Database integration for production data
@@ -239,6 +271,7 @@ ml/
 ## 📖 Documentation
 
 For additional documentation and guides:
+
 - [Builder.io Projects Documentation](https://www.builder.io/c/docs/projects)
 - [Model Training Guide](ml/README.md)
 - [API Reference](docs/api.md)
@@ -246,6 +279,7 @@ For additional documentation and guides:
 ## 🤝 Contributing
 
 This is a production-ready template that can be extended for real-world insurance applications. Key areas for enhancement:
+
 - Additional ML algorithms (Neural Networks, Ensemble methods)
 - Real-time model retraining capabilities
 - Advanced visualization and dashboards

@@ -8,7 +8,7 @@ import {
   trainModels,
   getModelPerformance,
   predictWithML,
-  getDatasetStats
+  getDatasetStats,
 } from "./routes/ml";
 
 export function createServer() {
