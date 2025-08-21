@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, Shield, TrendingUp, FileText, Car, User, AlertTriangle, CheckCircle2, Loader2, Brain, Database, BarChart3, Settings } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ModelExplanation } from '@/components/MLVisualization';
 
 interface RiskAssessmentInput {
   driverAge: number;
