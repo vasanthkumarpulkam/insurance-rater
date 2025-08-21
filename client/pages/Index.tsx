@@ -227,8 +227,15 @@ export default function Index() {
                       placeholder="5"
                       value={formData.vehicleAge || ''}
                       onChange={(e) => handleInputChange('vehicleAge', e.target.value)}
+                      className={errors.vehicleAge ? 'border-destructive' : ''}
                       required
                     />
+                    {errors.vehicleAge && (
+                      <p className="text-sm text-destructive flex items-center space-x-1">
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{errors.vehicleAge}</span>
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
