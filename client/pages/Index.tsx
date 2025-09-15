@@ -36,6 +36,8 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ModelExplanation } from "@/components/MLVisualization";
+import { badgeVariants } from "@/components/ui/badge";
+import RaterForm from "@/components/RaterForm";
 
 interface RiskAssessmentInput {
   driverAge: number;
@@ -389,7 +391,7 @@ export default function Index() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="assessment"
               className="flex items-center space-x-2"
@@ -417,6 +419,13 @@ export default function Index() {
             >
               <BarChart3 className="h-4 w-4" />
               <span>Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="fleet-rater"
+              className="flex items-center space-x-2"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Fleet Rater</span>
             </TabsTrigger>
           </TabsList>
 
@@ -638,12 +647,14 @@ export default function Index() {
                           Risk Score (0-100)
                         </div>
                         <Badge
-                          variant={
-                            result.riskCategory === "Low"
-                              ? "default"
-                              : "destructive"
+                          className={
+                            badgeVariants({
+                              variant:
+                                result.riskCategory === "Low"
+                                  ? "default"
+                                  : "destructive",
+                            }) + " mt-2 animate-in slide-in-from-bottom-2 duration-700"
                           }
-                          className="mt-2 animate-in slide-in-from-bottom-2 duration-700"
                         >
                           {result.riskCategory === "Low" ? (
                             <CheckCircle2 className="mr-1 h-3 w-3" />
@@ -812,7 +823,7 @@ export default function Index() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {Object.entries(modelPerformance).map(
+                      {(Object.entries(modelPerformance) as [string, MLModelPerformance][]).map(
                         ([modelName, metrics]) => (
                           <div
                             key={modelName}
@@ -1010,11 +1021,12 @@ export default function Index() {
                               <div className="text-gray-500">Risk Category</div>
                               <div className="font-medium">
                                 <Badge
-                                  variant={
-                                    mlResult.risk_category === "Low"
-                                      ? "default"
-                                      : "destructive"
-                                  }
+                                  className={badgeVariants({
+                                    variant:
+                                      mlResult.risk_category === "Low"
+                                        ? "default"
+                                        : "destructive",
+                                  })}
                                 >
                                   {mlResult.risk_category}
                                 </Badge>
@@ -1162,6 +1174,11 @@ export default function Index() {
               featureImportance={featureImportance}
               modelPerformance={modelPerformance}
             />
+          </TabsContent>
+
+          {/* Fleet Rater Tab */}
+          <TabsContent value="fleet-rater" className="mt-6">
+            <RaterForm />
           </TabsContent>
         </Tabs>
       </main>
