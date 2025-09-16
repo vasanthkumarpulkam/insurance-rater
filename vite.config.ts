@@ -6,12 +6,16 @@ import { createServer } from "./server";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
+    host: "0.0.0.0",
+    port: Number(process.env.PORT) || 3000,
     fs: {
       allow: ["./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
+  },
+  preview: {
+    host: "0.0.0.0",
+    port: Number(process.env.PORT) || 3000,
   },
   build: {
     outDir: "dist/spa",
