@@ -127,19 +127,165 @@ export const generateDataset: RequestHandler = async (req, res) => {
           });
         }
       } else {
-        res.status(500).json({
-          success: false,
-          message: "Failed to generate dataset",
-          error: errorOutput,
-        });
+        // Python ran but failed (e.g., missing pandas). Fallback to Node synthetic generator.
+        try {
+          const rows: string[] = [];
+          const header = [
+            "Driver_Age",
+            "Vehicle_Age",
+            "Vehicle_Type",
+            "Violations",
+            "Accidents",
+            "Prior_Claims",
+            "Geographic_Risk",
+            "Credit_Score",
+            "Has_Claim",
+            "Risk_Score",
+            "Annual_Premium",
+            "Claim_Cost",
+          ];
+          rows.push(header.join(","));
+          const vehicleTypes = ["Sedan", "SUV", "Tractor", "BoxTruck"];
+          const N = 500;
+          for (let i = 0; i < N; i++) {
+            const driverAge = Math.floor(18 + Math.random() * 55);
+            const vehicleAge = Math.floor(Math.random() * 20);
+            const vType = vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
+            const violations = Math.floor(Math.random() * 4);
+            const accidents = Math.floor(Math.random() * 3);
+            const priorClaims = Math.floor(Math.random() * 2);
+            const geo = Number((0.7 + Math.random() * 1.3).toFixed(2));
+            const credit = Math.floor(550 + Math.random() * 250);
+            const baseRisk =
+              0.02 * (driverAge < 25 ? 1.8 : driverAge > 65 ? 1.4 : 1.0) +
+              0.03 * (violations * 0.6 + accidents * 0.9 + priorClaims * 0.7) +
+              0.01 * (vehicleAge / 10) +
+              0.02 * (geo - 1);
+            const riskScore = Math.max(0, Math.min(100, Math.round(baseRisk * 100)));
+            const hasClaim = Math.random() < Math.min(0.6, baseRisk + 0.05) ? 1 : 0;
+            const basePremium = 1200;
+            const premium = Math.round(basePremium * (1 + riskScore / 80));
+            const claimCost = hasClaim ? Math.round(1000 + Math.random() * 9000) : 0;
+            rows.push(
+              [
+                driverAge,
+                vehicleAge,
+                vType,
+                violations,
+                accidents,
+                priorClaims,
+                geo,
+                credit,
+                hasClaim,
+                riskScore,
+                premium,
+                claimCost,
+              ].join(","),
+            );
+          }
+          const dir = "ml/data";
+          await fs.mkdir(dir, { recursive: true });
+          await fs.writeFile(`${dir}/insurance_dataset.csv`, rows.join("\n"));
+          await fs.writeFile(
+            `${dir}/insurance_dataset_metadata.json`,
+            JSON.stringify({ generated_by: "node-fallback", samples: N, errorOutput }, null, 2),
+          );
+          return res.json({
+            success: true,
+            message: "Dataset generated with Node fallback (Python error)",
+            output: output,
+            dataset_size: rows.join("\n").length,
+            metadata: { generated_by: "node-fallback", samples: N },
+          });
+        } catch (e) {
+          res.status(500).json({
+            success: false,
+            message: "Failed to generate dataset",
+            error: errorOutput,
+          });
+        }
       }
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error generating dataset",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    // Fallback: generate a small synthetic CSV using Node when Python isn't available (e.g., preview platforms)
+    try {
+      const rows: string[] = [];
+      const header = [
+        "Driver_Age",
+        "Vehicle_Age",
+        "Vehicle_Type",
+        "Violations",
+        "Accidents",
+        "Prior_Claims",
+        "Geographic_Risk",
+        "Credit_Score",
+        "Has_Claim",
+        "Risk_Score",
+        "Annual_Premium",
+        "Claim_Cost",
+      ];
+      rows.push(header.join(","));
+
+      const vehicleTypes = ["Sedan", "SUV", "Tractor", "BoxTruck"];
+      const N = 500;
+      for (let i = 0; i < N; i++) {
+        const driverAge = Math.floor(18 + Math.random() * 55);
+        const vehicleAge = Math.floor(Math.random() * 20);
+        const vType = vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
+        const violations = Math.floor(Math.random() * 4);
+        const accidents = Math.floor(Math.random() * 3);
+        const priorClaims = Math.floor(Math.random() * 2);
+        const geo = Number((0.7 + Math.random() * 1.3).toFixed(2));
+        const credit = Math.floor(550 + Math.random() * 250);
+        const baseRisk =
+          0.02 * (driverAge < 25 ? 1.8 : driverAge > 65 ? 1.4 : 1.0) +
+          0.03 * (violations * 0.6 + accidents * 0.9 + priorClaims * 0.7) +
+          0.01 * (vehicleAge / 10) +
+          0.02 * (geo - 1);
+        const riskScore = Math.max(0, Math.min(100, Math.round(baseRisk * 100)));
+        const hasClaim = Math.random() < Math.min(0.6, baseRisk + 0.05) ? 1 : 0;
+        const basePremium = 1200;
+        const premium = Math.round(basePremium * (1 + riskScore / 80));
+        const claimCost = hasClaim ? Math.round(1000 + Math.random() * 9000) : 0;
+        rows.push(
+          [
+            driverAge,
+            vehicleAge,
+            vType,
+            violations,
+            accidents,
+            priorClaims,
+            geo,
+            credit,
+            hasClaim,
+            riskScore,
+            premium,
+            claimCost,
+          ].join(","),
+        );
+      }
+
+      const dir = "ml/data";
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(`${dir}/insurance_dataset.csv`, rows.join("\n"));
+      await fs.writeFile(
+        `${dir}/insurance_dataset_metadata.json`,
+        JSON.stringify({ generated_by: "node-fallback", samples: N }, null, 2),
+      );
+
+      res.json({
+        success: true,
+        message: "Dataset generated with Node fallback (Python unavailable)",
+        dataset_size: rows.join("\n").length,
+        metadata: { generated_by: "node-fallback", samples: N },
+      });
+    } catch (e) {
+      res.status(500).json({
+        success: false,
+        message: "Error generating dataset",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
   }
 };
 
