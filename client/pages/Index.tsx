@@ -124,6 +124,7 @@ export default function Index() {
     generating: false,
   });
   const [activeTab, setActiveTab] = useState("assessment");
+  const [runtime, setRuntime] = useState<{ serverless: boolean; pythonAvailable: boolean; mlEnabled: boolean } | null>(null);
 
   // Simulated Random Forest model logic
   const calculateRisk = (input: RiskAssessmentInput): RiskResult => {
@@ -365,8 +366,20 @@ export default function Index() {
 
   // Load initial data
   useEffect(() => {
-    loadModelPerformance();
-    loadDatasetStats();
+    fetch("/api/runtime")
+      .then((r) => r.json())
+      .then((r) => setRuntime(r))
+      .catch(() => setRuntime({ serverless: true, pythonAvailable: false, mlEnabled: false }));
+    // Only try ML endpoints if runtime indicates support
+    fetch("/api/runtime")
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.mlEnabled) {
+          loadModelPerformance();
+          loadDatasetStats();
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -399,13 +412,15 @@ export default function Index() {
               <FileText className="h-4 w-4" />
               <span>Risk Assessment</span>
             </TabsTrigger>
-            <TabsTrigger
-              value="ml-models"
-              className="flex items-center space-x-2"
-            >
-              <Brain className="h-4 w-4" />
-              <span>ML Models</span>
-            </TabsTrigger>
+            {runtime?.mlEnabled && (
+              <TabsTrigger
+                value="ml-models"
+                className="flex items-center space-x-2"
+              >
+                <Brain className="h-4 w-4" />
+                <span>ML Models</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger
               value="dataset"
               className="flex items-center space-x-2"
@@ -731,7 +746,8 @@ export default function Index() {
           </TabsContent>
 
           {/* ML Models Tab */}
-          <TabsContent value="ml-models" className="mt-6">
+          {runtime?.mlEnabled && (
+            <TabsContent value="ml-models" className="mt-6">
             <div className="space-y-6">
               {/* Model Training Section */}
               <Card>
@@ -1049,6 +1065,7 @@ export default function Index() {
               )}
             </div>
           </TabsContent>
+          )}
 
           {/* Dataset Tab */}
           <TabsContent value="dataset" className="mt-6">

@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { exec } from "child_process";
 import {
   installDependencies,
   generateDataset,
@@ -29,6 +30,19 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Runtime capability endpoint for gating ML features in previews/serverless
+  app.get("/api/runtime", async (_req, res) => {
+    const isServerless = Boolean(process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const pythonAvailable = await new Promise<boolean>((resolve) => {
+      if (isServerless) return resolve(false);
+      exec("python3 --version", (err) => {
+        if (!err) return resolve(true);
+        exec("python --version", (err2) => resolve(!err2));
+      });
+    });
+    res.json({ serverless: isServerless, pythonAvailable, mlEnabled: !isServerless && pythonAvailable });
+  });
 
   // ML API routes
   app.post("/api/ml/install-deps", installDependencies);
