@@ -268,13 +268,6 @@ ml/
 - Database integration for production data
 - Export capabilities for regulatory reporting
 
-## 📖 Documentation
-
-For additional documentation and guides:
-
-- [Builder.io Projects Documentation](https://www.builder.io/c/docs/projects)
-- [Model Training Guide](ml/README.md)
-- [API Reference](docs/api.md)
 
 ## 🤝 Contributing
 
