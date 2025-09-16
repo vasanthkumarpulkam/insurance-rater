@@ -36,6 +36,8 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ModelExplanation } from "@/components/MLVisualization";
+import { badgeVariants } from "@/components/ui/badge";
+import RaterForm from "@/components/RaterForm";
 
 interface RiskAssessmentInput {
   driverAge: number;
@@ -122,6 +124,7 @@ export default function Index() {
     generating: false,
   });
   const [activeTab, setActiveTab] = useState("assessment");
+  const [runtime, setRuntime] = useState<{ serverless: boolean; pythonAvailable: boolean; mlEnabled: boolean } | null>(null);
 
   // Simulated Random Forest model logic
   const calculateRisk = (input: RiskAssessmentInput): RiskResult => {
@@ -363,8 +366,20 @@ export default function Index() {
 
   // Load initial data
   useEffect(() => {
-    loadModelPerformance();
-    loadDatasetStats();
+    fetch("/api/runtime")
+      .then((r) => r.json())
+      .then((r) => setRuntime(r))
+      .catch(() => setRuntime({ serverless: true, pythonAvailable: false, mlEnabled: false }));
+    // Only try ML endpoints if runtime indicates support
+    fetch("/api/runtime")
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.mlEnabled) {
+          loadModelPerformance();
+          loadDatasetStats();
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -389,7 +404,7 @@ export default function Index() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger
               value="assessment"
               className="flex items-center space-x-2"
@@ -397,13 +412,15 @@ export default function Index() {
               <FileText className="h-4 w-4" />
               <span>Risk Assessment</span>
             </TabsTrigger>
-            <TabsTrigger
-              value="ml-models"
-              className="flex items-center space-x-2"
-            >
-              <Brain className="h-4 w-4" />
-              <span>ML Models</span>
-            </TabsTrigger>
+            {runtime?.mlEnabled && (
+              <TabsTrigger
+                value="ml-models"
+                className="flex items-center space-x-2"
+              >
+                <Brain className="h-4 w-4" />
+                <span>ML Models</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger
               value="dataset"
               className="flex items-center space-x-2"
@@ -417,6 +434,13 @@ export default function Index() {
             >
               <BarChart3 className="h-4 w-4" />
               <span>Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="fleet-rater"
+              className="flex items-center space-x-2"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Fleet Rater</span>
             </TabsTrigger>
           </TabsList>
 
@@ -638,12 +662,14 @@ export default function Index() {
                           Risk Score (0-100)
                         </div>
                         <Badge
-                          variant={
-                            result.riskCategory === "Low"
-                              ? "default"
-                              : "destructive"
+                          className={
+                            badgeVariants({
+                              variant:
+                                result.riskCategory === "Low"
+                                  ? "default"
+                                  : "destructive",
+                            }) + " mt-2 animate-in slide-in-from-bottom-2 duration-700"
                           }
-                          className="mt-2 animate-in slide-in-from-bottom-2 duration-700"
                         >
                           {result.riskCategory === "Low" ? (
                             <CheckCircle2 className="mr-1 h-3 w-3" />
@@ -720,7 +746,8 @@ export default function Index() {
           </TabsContent>
 
           {/* ML Models Tab */}
-          <TabsContent value="ml-models" className="mt-6">
+          {runtime?.mlEnabled && (
+            <TabsContent value="ml-models" className="mt-6">
             <div className="space-y-6">
               {/* Model Training Section */}
               <Card>
@@ -812,7 +839,7 @@ export default function Index() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {Object.entries(modelPerformance).map(
+                      {(Object.entries(modelPerformance) as [string, MLModelPerformance][]).map(
                         ([modelName, metrics]) => (
                           <div
                             key={modelName}
@@ -1010,11 +1037,12 @@ export default function Index() {
                               <div className="text-gray-500">Risk Category</div>
                               <div className="font-medium">
                                 <Badge
-                                  variant={
-                                    mlResult.risk_category === "Low"
-                                      ? "default"
-                                      : "destructive"
-                                  }
+                                  className={badgeVariants({
+                                    variant:
+                                      mlResult.risk_category === "Low"
+                                        ? "default"
+                                        : "destructive",
+                                  })}
                                 >
                                   {mlResult.risk_category}
                                 </Badge>
@@ -1037,6 +1065,7 @@ export default function Index() {
               )}
             </div>
           </TabsContent>
+          )}
 
           {/* Dataset Tab */}
           <TabsContent value="dataset" className="mt-6">
@@ -1162,6 +1191,11 @@ export default function Index() {
               featureImportance={featureImportance}
               modelPerformance={modelPerformance}
             />
+          </TabsContent>
+
+          {/* Fleet Rater Tab */}
+          <TabsContent value="fleet-rater" className="mt-6">
+            <RaterForm />
           </TabsContent>
         </Tabs>
       </main>
