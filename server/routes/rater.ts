@@ -8,7 +8,7 @@ import {
 	Vehicle,
 	Trailer,
 	LineOfBusiness,
-} from "@shared/insurance";
+} from "../../shared/insurance";
 
 // Simple deterministic rating engine with transparent factors
 

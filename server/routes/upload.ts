@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { parse as parseCsv } from "csv-parse/sync";
 import { z } from "zod";
-import { SubmissionSchema } from "@shared/insurance";
+import { SubmissionSchema } from "../../shared/insurance";
 
 const CsvTypeSchema = z.enum(["drivers", "vehicles", "trailers"]);
 
