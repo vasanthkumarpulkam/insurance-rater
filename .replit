@@ -1,0 +1,8 @@
+run = "pnpm dev"
+install = "pnpm install"
+language = "nodejs"
+
+[env]
+# Replit sets PORT automatically; vite.config.ts also reads it
+# You can override in the shell if needed
+# PORT = "3000"
